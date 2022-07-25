@@ -1,5 +1,7 @@
 filters:
+  clientIdKey: clientId
   firstNameKey: firstName
   lastNameKey: lastName
   emailKey: email
   telephoneKey: telephone
+  filtersKey: ${filters.firstNameKey},${filters.lastNameKey},${filters.emailKey},${filters.telephoneKey}
