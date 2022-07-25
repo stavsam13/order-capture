@@ -1,0 +1,5 @@
+filters:
+  firstNameKey: firstName
+  lastNameKey: lastName
+  emailKey: email
+  telephoneKey: telephone
