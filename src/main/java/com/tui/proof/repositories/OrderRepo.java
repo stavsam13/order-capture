@@ -12,4 +12,6 @@ import java.util.List;
 @Repository
 public interface OrderRepo extends JpaRepository<OrderEntity,Long>, JpaSpecificationExecutor<OrderEntity> {
     List<OrderDTO> findByClientClientIdIn(List<Long> clientId);
+
+    OrderEntity findByOrderNumber(Long orderNumber);
 }

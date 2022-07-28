@@ -8,13 +8,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
+import javax.validation.Valid;
 import java.util.Map;
-import java.util.Optional;
 
 @Log4j2
 @RestController
@@ -35,10 +33,25 @@ public class PillotesController {
   }
 
   @PostMapping(value = ApisEndPoints.CREATE_ENDPOINT)
-  public ResponseEntity<OrderDTO> createOrders(@RequestBody OrderDTO orderDTO) throws Exception {
+  public ResponseEntity<OrderDTO> createOrders(@Valid @RequestBody OrderDTO orderDTO) throws Exception {
     LOGGER.info("We have started creating your Pillotes!");
-    final OrderDTO response = pillotesService.createPilotesService1(orderDTO);
+    final OrderDTO response = pillotesService.createPilotesService(orderDTO);
     LOGGER.info("Pillotes order have been created successfully!");
-    return new ResponseEntity<>(response, HttpStatus.OK);
+    return new ResponseEntity<>(response, HttpStatus.CREATED);
   }
+
+  @PutMapping(value = ApisEndPoints.UPDATE_ORDER_ENDPOINT)
+  public ResponseEntity<OrderDTO> updateOrder(@RequestParam Long orderNumber,
+                                              @RequestBody OrderDTO orderDTO) throws Exception {
+    try{
+    LOGGER.info("We have started updating your Pillotes Orders!");
+    final OrderDTO response = pillotesService.updatePilotesOrder(orderNumber,orderDTO);
+    LOGGER.info("Pillotes order have been updated successfully!");
+    return new ResponseEntity<>(response,HttpStatus.OK);}
+    catch (Exception ex) {
+        LOGGER.info(ex.getMessage());
+    }
+    return null;
+  }
+
 }

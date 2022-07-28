@@ -7,17 +7,13 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
-import com.tui.proof.model.OrderDTO;
 import com.tui.proof.util.Constants;
-import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
-import lombok.ToString;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
-import java.util.List;
 
 @Entity
 @Table(name = "PILOTES")
@@ -29,6 +25,7 @@ public class OrderEntity {
     @NotNull
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long orderNumber;
+    @NotNull
     private int pilotes;
     private double orderTotal;
     @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)

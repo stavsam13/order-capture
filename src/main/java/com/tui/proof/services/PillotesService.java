@@ -17,7 +17,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -26,6 +25,7 @@ import org.springframework.stereotype.Service;
 
 
 import javax.persistence.criteria.Join;
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.*;
 
@@ -82,10 +82,6 @@ public class PillotesService {
                     .configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false)
                     .configure(DeserializationFeature.ACCEPT_EMPTY_STRING_AS_NULL_OBJECT, true);
 
-    public static <T> Specification<T> createGreaterThanSpec(String key, Object value) {
-        return ((root, criteriaQuery, criteriaBuilder) -> criteriaBuilder.
-                gt(root.get(key), Integer.valueOf(String.valueOf(value))));
-    }
 
     public static <T> Specification<T> createGreaterThanSpecJoinClient(String key, Object value,
                                                                        String joinColumn ) {
@@ -96,15 +92,7 @@ public class PillotesService {
 
     }
 
-    public static <T> Specification<T> createLikeSpec(String key, Object value) {
-        return ((root, criteriaQuery, criteriaBuilder) -> criteriaBuilder.
-                like(root.get(key), "%" + value + "%"));
-    }
 
-    public static <T> Specification<T> createEqualsSpec(String key, Object value) {
-        return ((root, criteriaQuery, criteriaBuilder) -> criteriaBuilder.
-                equal(root.get(key), value));
-    }
 
     public static <T> Specification<T> createEqualSpecJoinClient(String key, Object value,
                                                                 String joinColumn ) {
@@ -122,28 +110,16 @@ public class PillotesService {
         };
 
     }
-    public OrderDTO createPilotesService1(OrderDTO orderDTO) throws Exception {
+    public OrderDTO createPilotesService(OrderDTO orderDTO) throws Exception {
 
         LOGGER.info("Create Service method has started");
 
         if (orderDTO.getPilotes() == 5 || orderDTO.getPilotes() == 10 || orderDTO.getPilotes() == 15) {
             orderDTO.setOrderTime(LocalDateTime.now());
+            LOGGER.info("Calculating cost of Order");
             orderDTO.setOrderTotal(orderDTO.getPilotes() * FIX_COST);
-            ClientDTO clientDTO = convertClientEntityToDTO(orderDTO.getClient());
-            AddressDTO addressDTO = convertAddressEntityToDTO(clientDTO.getAddress());
-
-            AddressEntity addressEntity = convertAddressDTOtoEntity(addressDTO);
-            addressEntity = addressRepo.save(addressEntity);
-            addressRepo.flush();
-
-            ClientEntity clientEntity = convertClientDTOtoEntity(clientDTO);
-            clientEntity.setAddress(addressEntity);
-            clientEntity = clientRepo.save(clientEntity);
-            clientRepo.flush();
-
 
             OrderEntity orderEntity = convertOrderDTOtoEntity(orderDTO);
-            orderEntity.setClient(clientEntity);
             orderEntity = orderRepo.save(orderEntity);
             orderRepo.flush();
             return convertOrderEntityToDTO(orderEntity);
@@ -154,12 +130,9 @@ public class PillotesService {
 
     public Map<String ,Object> searchPillotes(Map<String, Object> request) {
         Map<String, Object> filterOption = (Map<String, Object>) request.get("filters");
-        Map<String, String> sorting = (Map<String, String>) request.get("sorting");
-        Map<String, Integer> pages = (Map<String, Integer>) request.get("pagination");
         Map<String,Object> response = new HashMap<>();
         // I am initilizing my query
         Specification<OrderEntity> specification = getSpecification(filterOption);
-        Pageable pagination = getPageable(sorting,pages,pillotesFilteringProperties);
 
         List<OrderEntity> orderList = orderRepo.findAll(specification);
         final List<OrderDTO> listForResponse = new ArrayList<>();
@@ -201,28 +174,30 @@ public class PillotesService {
         }
         return specification;
     }
-    public static Pageable getPageable(Map<String, String> sorting, Map<String, Integer> pages,
-                                       PillotesFilteringProperties pillotesFilteringProperties) {
 
-        Integer pageNumber = pages.get(pillotesFilteringProperties.getPageNumberKey());
-        Integer pageSize = pages.get(pillotesFilteringProperties.getPageSizeKey());
-        if (pageNumber == null || pageSize == null) {
-            throw new RuntimeException("PageNo or pageSize is zero.");
-        }
-        Pageable pagination = PageRequest.of(pageNumber, pageSize);
-        List<Sort.Order> orders = new ArrayList<>();
-        if (sorting != null) {
-            for (Map.Entry<String, String> entry : sorting.entrySet()) {
-                orders.add(new Sort.Order(
-                        pillotesFilteringProperties.getAscSortingKey().equals(entry.getValue()) ? Sort.Direction.ASC
-                                : Sort.Direction.DESC, entry.getKey()));
+    public OrderDTO updatePilotesOrder(Long orderNumber, OrderDTO updatedOrderDTO) throws Exception {
+        LOGGER.info("Update Service method has started");
+
+        OrderEntity originalOrder = orderRepo.findByOrderNumber(orderNumber);
+
+        OrderDTO originalDTO = convertOrderEntityToDTO(originalOrder);
+
+        Duration duration = Duration.between(originalDTO.getOrderTime(),LocalDateTime.now());
+        if (Integer.parseInt(String.valueOf(duration.toMinutes())) < 5) {
+            if(updatedOrderDTO.getPilotes() == 5 || updatedOrderDTO.getPilotes()==10
+                    || updatedOrderDTO.getPilotes() == 15) {
+                updatedOrderDTO.setOrderTotal(updatedOrderDTO.getPilotes() * FIX_COST);
+                originalDTO = updatedOrderDTO;
+                originalDTO.setOrderTime(LocalDateTime.now());
+                originalDTO.setOrderNumber(originalOrder.getOrderNumber());
+                orderRepo.save(convertOrderDTOtoEntity(originalDTO));
+                orderRepo.flush();
+            } else {
+                throw new Exception("Invalid Number of Pillotes");
             }
+        } else {
+            throw new Exception("You are late Miquel is occupied cooking the pilotes");
         }
-
-        if (!(orders.isEmpty())) {
-            pagination = PageRequest.of(pageNumber, pageSize, Sort.by(orders));
-        }
-        return pagination;
+        return originalDTO;
     }
-
 }

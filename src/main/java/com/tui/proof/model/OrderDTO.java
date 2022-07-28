@@ -12,12 +12,14 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 
+import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 
 @Getter
 @Setter
 public class OrderDTO {
   private Long orderNumber;
+  @NotNull
   private int pilotes;
   private double orderTotal;
   private ClientEntity client;

@@ -19,8 +19,8 @@ CREATE TABLE ADDRESS (
 
 CREATE TABLE CLIENT (
   clientId INT AUTO_INCREMENT  PRIMARY KEY,
-  first_name VARCHAR(250),
-  last_name VARCHAR(250),
-  email VARCHAR(250),
-  telephone VARCHAR(250)
+  first_name VARCHAR(250) NOT NULL,
+  last_name VARCHAR(250) NOT NULL,
+  email VARCHAR(250)NOT NULL,
+  telephone VARCHAR(250)NOT NULL
 );
