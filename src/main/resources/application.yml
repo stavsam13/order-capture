@@ -4,4 +4,9 @@ filters:
   lastNameKey: lastName
   emailKey: email
   telephoneKey: telephone
+  joinColumnOrderKey: client
+  pageNumberKey: pageNumber
+  pageSizeKey: pageSize
+  ascSortingKey: asc
+  descSortingKey: desc
   filtersKey: ${filters.firstNameKey},${filters.lastNameKey},${filters.emailKey},${filters.telephoneKey}

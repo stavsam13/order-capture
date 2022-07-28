@@ -1,22 +1,24 @@
 package com.tui.proof.entity;
 
-import lombok.Data;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import lombok.Getter;
+import lombok.Setter;
+
+import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 
 @Entity
-@Data
+@Getter
+@Setter
+@Table(name="ADDRESS")
 public class AddressEntity {
 
     @Id
     @NotNull
     @GeneratedValue(strategy = GenerationType.AUTO)
-    private int addressId;
-    private String street;
+    private Long addressId;
+    private String streetName;
+    private String streetNumber;
     private String postcode;
     private String city;
     private String country;
