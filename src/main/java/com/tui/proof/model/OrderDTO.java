@@ -5,24 +5,19 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
-import com.tui.proof.entity.ClientEntity;
 import com.tui.proof.util.Constants;
 import lombok.Data;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
 
 import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 
-@Getter
-@Setter
+@Data
 public class OrderDTO {
   private Long orderNumber;
   @NotNull
   private int pilotes;
   private double orderTotal;
-  private ClientEntity client;
+  private ClientDTO client;
   @JsonDeserialize(using = LocalDateTimeDeserializer.class)
   @JsonSerialize(using = LocalDateTimeSerializer.class)
   @JsonFormat(pattern = Constants.DATE_FORMAT)

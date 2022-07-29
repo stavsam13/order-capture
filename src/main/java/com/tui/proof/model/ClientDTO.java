@@ -1,18 +1,13 @@
 package com.tui.proof.model;
 
-import com.tui.proof.entity.AddressEntity;
-import com.tui.proof.entity.OrderEntity;
+
 import lombok.Data;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
 
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Size;
 
-@Getter
-@Setter
+@Data
 public class ClientDTO {
   private Long clientId;
   @NotEmpty
@@ -25,5 +20,5 @@ public class ClientDTO {
   @NotEmpty
   @Email
   private String email;
-  private AddressEntity address;
+  private AddressDTO address;
 }

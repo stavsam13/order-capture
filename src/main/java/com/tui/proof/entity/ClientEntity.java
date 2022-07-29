@@ -1,8 +1,7 @@
 package com.tui.proof.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 import javax.persistence.*;
 import javax.validation.constraints.Email;
@@ -11,8 +10,9 @@ import java.util.List;
 
 @Entity
 @Table(name="CLIENT")
-@Getter
-@Setter
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class ClientEntity {
 
     @Id
@@ -31,7 +31,7 @@ public class ClientEntity {
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "addressId",referencedColumnName = "addressId")
     private AddressEntity address;
-    @OneToMany(mappedBy = "client",fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "client", cascade = CascadeType.ALL)
     @JsonIgnoreProperties("client")
     private List<OrderEntity> order;
 }

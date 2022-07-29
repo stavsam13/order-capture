@@ -3,55 +3,47 @@ package com.tui.proof.services;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
-import com.tui.proof.entity.AddressEntity;
 import com.tui.proof.entity.ClientEntity;
 import com.tui.proof.entity.OrderEntity;
 import com.tui.proof.model.AddressDTO;
 import com.tui.proof.model.ClientDTO;
 import com.tui.proof.model.OrderDTO;
-import com.tui.proof.repositories.AddressRepo;
-import com.tui.proof.repositories.ClientRepo;
 import com.tui.proof.repositories.OrderRepo;
+import com.tui.proof.util.Constants;
 import com.tui.proof.util.PillotesFilteringProperties;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 
 import javax.persistence.criteria.Join;
+import javax.transaction.Transactional;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.*;
 
 @Service
+@Transactional
 @EnableConfigurationProperties(PillotesFilteringProperties.class)
 public class PillotesService {
 
-    private static final double FIX_COST = 1.33;
-    @Autowired
-    ClientRepo clientRepo;
+
     @Autowired
     OrderRepo orderRepo;
-    @Autowired
-    AddressRepo addressRepo;
     @Autowired
     PillotesFilteringProperties pillotesFilteringProperties;
 
     private static final Logger LOGGER = LoggerFactory.getLogger(PillotesService.class);
 
-    public static AddressEntity convertAddressDTOtoEntity(AddressDTO addressDTO) {
-        return MAPPER.convertValue(addressDTO, AddressEntity.class);
-    }
+    private static final double FIX_COST = 1.33;
+    public static final ObjectMapper MAPPER =
+            new ObjectMapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
+                    .configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false)
+                    .configure(DeserializationFeature.ACCEPT_EMPTY_STRING_AS_NULL_OBJECT, true);
 
-    public static ClientEntity convertClientDTOtoEntity(ClientDTO clientDTO) {
-        return MAPPER.convertValue(clientDTO, ClientEntity.class);
-    }
 
     public static OrderEntity convertOrderDTOtoEntity(OrderDTO orderDTO) {
         return MAPPER.convertValue(orderDTO, OrderEntity.class);
@@ -64,35 +56,6 @@ public class PillotesService {
     public static ClientDTO convertClientEntityToDTO(ClientEntity clientEntity) {
         return MAPPER.convertValue(clientEntity, ClientDTO.class);
     }
-
-    public static AddressDTO convertAddressEntityToDTO(AddressEntity address) {
-        return MAPPER.convertValue(address, AddressDTO.class);
-    }
-
-    public static AddressEntity convertAddressDTOToEntity(AddressDTO addressDTO) {
-        return MAPPER.convertValue(addressDTO, AddressEntity.class);
-    }
-
-    public static ClientEntity convertClientDTOToEntity(ClientDTO clientDTO) {
-        return MAPPER.convertValue(clientDTO, ClientEntity.class);
-    }
-
-    public static final ObjectMapper MAPPER =
-            new ObjectMapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
-                    .configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false)
-                    .configure(DeserializationFeature.ACCEPT_EMPTY_STRING_AS_NULL_OBJECT, true);
-
-
-    public static <T> Specification<T> createGreaterThanSpecJoinClient(String key, Object value,
-                                                                       String joinColumn ) {
-        return (root, criteriaQuery, criteriaBuilder) -> {
-            Join<OrderEntity,ClientEntity> join = root.join(joinColumn);
-            return criteriaBuilder.gt(join.get(key),Long.valueOf(String.valueOf(value)));
-        };
-
-    }
-
-
 
     public static <T> Specification<T> createEqualSpecJoinClient(String key, Object value,
                                                                 String joinColumn ) {
@@ -127,11 +90,10 @@ public class PillotesService {
             throw new Exception("Invalid number of Pillotes");
         }
     }
-
     public Map<String ,Object> searchPillotes(Map<String, Object> request) {
-        Map<String, Object> filterOption = (Map<String, Object>) request.get("filters");
+        Map<String, Object> filterOption = (Map<String, Object>) request.get(Constants.FILTERS);
         Map<String,Object> response = new HashMap<>();
-        // I am initilizing my query
+        LOGGER.info("Creating specification for the search");
         Specification<OrderEntity> specification = getSpecification(filterOption);
 
         List<OrderEntity> orderList = orderRepo.findAll(specification);
@@ -140,7 +102,7 @@ public class PillotesService {
             OrderDTO itemToAdd = convertOrderEntityToDTO(orderEntity);
             listForResponse.add(itemToAdd);
         }
-        response.put("Orders",listForResponse);
+        response.put("Orders Result",listForResponse);
         return response;
     }
 
@@ -181,6 +143,8 @@ public class PillotesService {
         OrderEntity originalOrder = orderRepo.findByOrderNumber(orderNumber);
 
         OrderDTO originalDTO = convertOrderEntityToDTO(originalOrder);
+        ClientDTO originalClientDTO = convertClientEntityToDTO(originalOrder.getClient());
+        AddressDTO originalAddressDTO = originalClientDTO.getAddress();
 
         Duration duration = Duration.between(originalDTO.getOrderTime(),LocalDateTime.now());
         if (Integer.parseInt(String.valueOf(duration.toMinutes())) < 5) {
@@ -189,7 +153,12 @@ public class PillotesService {
                 updatedOrderDTO.setOrderTotal(updatedOrderDTO.getPilotes() * FIX_COST);
                 originalDTO = updatedOrderDTO;
                 originalDTO.setOrderTime(LocalDateTime.now());
+
+                //seting the original id so that , a new record is not created upon updating
                 originalDTO.setOrderNumber(originalOrder.getOrderNumber());
+                originalDTO.getClient().setClientId(originalClientDTO.getClientId());
+                originalDTO.getClient().getAddress().setAddressId(originalAddressDTO.getAddressId());
+
                 orderRepo.save(convertOrderDTOtoEntity(originalDTO));
                 orderRepo.flush();
             } else {
