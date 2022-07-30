@@ -42,7 +42,7 @@ public class PillotesController {
 
   @PutMapping(value = ApisEndPoints.UPDATE_ORDER_ENDPOINT)
   public ResponseEntity<OrderDTO> updateOrder(@RequestParam Long orderNumber,
-                                              @RequestBody OrderDTO orderDTO) throws Exception {
+                                              @Valid @RequestBody OrderDTO orderDTO) throws Exception {
     try{
     LOGGER.info("We have started updating your Pillotes Orders!");
     final OrderDTO response = pillotesService.updatePilotesOrder(orderNumber,orderDTO);

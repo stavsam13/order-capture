@@ -26,7 +26,6 @@ public class ClientEntity {
     @NotNull
     private String telephone;
     @Email
-    @NotNull
     private String email;
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "addressId",referencedColumnName = "addressId")

@@ -1,42 +1,30 @@
 package com.tui.proof.config;
 
-import org.springframework.boot.autoconfigure.security.SecurityProperties;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.core.annotation.Order;
-import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.builders.WebSecurity;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 
-@Configuration
-public class Security extends WebSecurityConfigurerAdapter {
-
-    @Override
-    public void configure(WebSecurity web) {
-        web.ignoring().antMatchers("/h2-console/**","/tuiTest/createPillotes");
-    }
-    @Override
+@EnableWebSecurity
+public class Security  {
+    @Autowired
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-
         auth.inMemoryAuthentication()
-                .withUser("user").password("{noop}password").roles("USER")
-                .and()
-                .withUser("admin").password("{noop}password").roles("USER", "ADMIN");
-
+                .withUser("user").password("{noop}password").roles("USER");
     }
-
-    @Override
-    protected void configure(HttpSecurity http) throws Exception {
-
-        http
-                //HTTP Basic authentication
-                .httpBasic()
-                .and()
-                .authorizeRequests()
-                .antMatchers(HttpMethod.GET, "/searchPillotes").hasRole("USER")
-                .and()
-                .csrf().disable()
-                .formLogin().disable();
+    @Configuration
+    public static class ApiWebSecurityConfigurationAdapter extends WebSecurityConfigurerAdapter  {
+         protected void configure (HttpSecurity http) throws Exception {
+             http.
+                     csrf().disable().
+                     authorizeRequests()
+                     .antMatchers("tuiTest/createPillotes").permitAll()
+                .antMatchers("/tuiTest/updatePillotes").permitAll()
+                .antMatchers("/tuiTest/searchPillotes")
+                .hasRole("USER").and().httpBasic();
+//                     .
+        }
     }
 }
