@@ -5,6 +5,7 @@ import lombok.*;
 
 import javax.persistence.*;
 import javax.validation.constraints.Email;
+import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import java.util.List;
 
@@ -20,11 +21,14 @@ public class ClientEntity {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long clientId;
     @NotNull
+    @NotEmpty
     private String firstName;
     @NotNull
+    @NotEmpty
     private String lastName;
     @NotNull
     private String telephone;
+    @NotNull
     @Email
     private String email;
     @OneToOne(cascade = CascadeType.ALL)

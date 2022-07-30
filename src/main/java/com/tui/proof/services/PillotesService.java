@@ -76,7 +76,6 @@ public class PillotesService {
     public OrderDTO createPilotesService(OrderDTO orderDTO) throws Exception {
 
         LOGGER.info("Create Service method has started");
-
         if (orderDTO.getPilotes() == 5 || orderDTO.getPilotes() == 10 || orderDTO.getPilotes() == 15) {
             orderDTO.setOrderTime(LocalDateTime.now());
             LOGGER.info("Calculating cost of Order");
