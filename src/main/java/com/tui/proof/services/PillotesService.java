@@ -123,7 +123,7 @@ public class PillotesService {
                 }
                 if (pillotesFilteringProperties.getEmailKey().equals(filter)) {
                     specification = specification.
-                            and(createEqualSpecJoinClient(pillotesFilteringProperties.getEmailKey(),value,
+                            and(createLikeSpecJoinClient(pillotesFilteringProperties.getEmailKey(),value,
                                     pillotesFilteringProperties.getJoinColumnOrderKey()));
                 }
                 if (pillotesFilteringProperties.getTelephoneKey().equals(filter)) {

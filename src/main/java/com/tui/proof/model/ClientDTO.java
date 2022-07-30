@@ -13,12 +13,10 @@ public class ClientDTO {
   private Long clientId;
   @NotNull
   @NotEmpty
-  @NotEmpty
   private String firstName;
   @NotNull
   @NotEmpty
   private String lastName;
-  @NotNull
   @Size(min = 10 , max=13, message = "telephone should have at least 10 to 13 digits")
   private String telephone;
   @NotNull
