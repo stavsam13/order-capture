@@ -10,6 +10,7 @@ import com.tui.proof.model.ClientDTO;
 import com.tui.proof.model.OrderDTO;
 import com.tui.proof.repositories.OrderRepo;
 import com.tui.proof.util.Constants;
+import com.tui.proof.util.ErrorMessages;
 import com.tui.proof.util.PillotesFilteringProperties;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -86,7 +87,7 @@ public class PillotesService {
             orderRepo.flush();
             return convertOrderEntityToDTO(orderEntity);
         } else {
-            throw new Exception("Invalid number of Pillotes");
+            throw new IllegalArgumentException(ErrorMessages.INVALID_NUMBER_PILLOTES);
         }
     }
     public Map<String ,Object> searchPillotes(Map<String, Object> request) {
@@ -96,13 +97,17 @@ public class PillotesService {
         Specification<OrderEntity> specification = getSpecification(filterOption);
 
         List<OrderEntity> orderList = orderRepo.findAll(specification);
+        if(orderList.size()!=0) {
         final List<OrderDTO> listForResponse = new ArrayList<>();
         for (OrderEntity orderEntity : orderList) {
             OrderDTO itemToAdd = convertOrderEntityToDTO(orderEntity);
             listForResponse.add(itemToAdd);
         }
         response.put("Orders Result",listForResponse);
-        return response;
+        return response;}
+        else {
+            throw new IllegalArgumentException(ErrorMessages.NO_RECORD_FOUND_FOR_THE_GIVEN_FILTER_CRITERIA);
+        }
     }
 
     private Specification<OrderEntity> getSpecification(Map<String, Object> filterOption) {
@@ -140,32 +145,35 @@ public class PillotesService {
         LOGGER.info("Update Service method has started");
 
         OrderEntity originalOrder = orderRepo.findByOrderNumber(orderNumber);
+        if (originalOrder!=null) {
+            OrderDTO originalDTO = convertOrderEntityToDTO(originalOrder);
+            ClientDTO originalClientDTO = convertClientEntityToDTO(originalOrder.getClient());
+            AddressDTO originalAddressDTO = originalClientDTO.getAddress();
 
-        OrderDTO originalDTO = convertOrderEntityToDTO(originalOrder);
-        ClientDTO originalClientDTO = convertClientEntityToDTO(originalOrder.getClient());
-        AddressDTO originalAddressDTO = originalClientDTO.getAddress();
+            Duration duration = Duration.between(originalDTO.getOrderTime(),LocalDateTime.now());
+            if (Integer.parseInt(String.valueOf(duration.toMinutes())) < 5) {
+                if(updatedOrderDTO.getPilotes() == 5 || updatedOrderDTO.getPilotes()==10
+                        || updatedOrderDTO.getPilotes() == 15) {
+                    updatedOrderDTO.setOrderTotal(updatedOrderDTO.getPilotes() * FIX_COST);
+                    originalDTO = updatedOrderDTO;
+                    originalDTO.setOrderTime(LocalDateTime.now());
 
-        Duration duration = Duration.between(originalDTO.getOrderTime(),LocalDateTime.now());
-        if (Integer.parseInt(String.valueOf(duration.toMinutes())) < 5) {
-            if(updatedOrderDTO.getPilotes() == 5 || updatedOrderDTO.getPilotes()==10
-                    || updatedOrderDTO.getPilotes() == 15) {
-                updatedOrderDTO.setOrderTotal(updatedOrderDTO.getPilotes() * FIX_COST);
-                originalDTO = updatedOrderDTO;
-                originalDTO.setOrderTime(LocalDateTime.now());
+                    //seting the original id so that , a new record is not created upon updating
+                    originalDTO.setOrderNumber(originalOrder.getOrderNumber());
+                    originalDTO.getClient().setClientId(originalClientDTO.getClientId());
+                    originalDTO.getClient().getAddress().setAddressId(originalAddressDTO.getAddressId());
 
-                //seting the original id so that , a new record is not created upon updating
-                originalDTO.setOrderNumber(originalOrder.getOrderNumber());
-                originalDTO.getClient().setClientId(originalClientDTO.getClientId());
-                originalDTO.getClient().getAddress().setAddressId(originalAddressDTO.getAddressId());
-
-                orderRepo.save(convertOrderDTOtoEntity(originalDTO));
-                orderRepo.flush();
+                    orderRepo.save(convertOrderDTOtoEntity(originalDTO));
+                    orderRepo.flush();
+                } else {
+                    throw new IllegalArgumentException(ErrorMessages.INVALID_NUMBER_PILLOTES);
+                }
             } else {
-                throw new Exception("Invalid Number of Pillotes");
+                throw new IllegalArgumentException(ErrorMessages.LATE_UPDATE_ORDER);
             }
+            return originalDTO;
         } else {
-            throw new Exception("You are late Miquel is occupied cooking the pilotes");
+            throw new IllegalArgumentException(ErrorMessages.NO_RECORD_FOUND_FOR_THE_GIVEN_ID);
         }
-        return originalDTO;
     }
 }

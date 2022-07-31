@@ -43,15 +43,9 @@ public class PillotesController {
   @PutMapping(value = ApisEndPoints.UPDATE_ORDER_ENDPOINT)
   public ResponseEntity<OrderDTO> updateOrder(@RequestParam Long orderNumber,
                                               @Valid @RequestBody OrderDTO orderDTO) throws Exception {
-    try{
     LOGGER.info("We have started updating your Pillotes Orders!");
     final OrderDTO response = pillotesService.updatePilotesOrder(orderNumber,orderDTO);
     LOGGER.info("Pillotes order have been updated successfully!");
     return new ResponseEntity<>(response,HttpStatus.OK);}
-    catch (Exception ex) {
-        LOGGER.info(ex.getMessage());
-    }
-    return null;
-  }
 
 }
