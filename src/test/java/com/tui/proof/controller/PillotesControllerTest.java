@@ -14,7 +14,10 @@ import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.ResponseEntity;
 
+import java.text.ParseException;
 import java.time.LocalDateTime;
+import java.util.HashMap;
+import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
@@ -24,6 +27,9 @@ public class PillotesControllerTest {
     OrderDTO orderDTO;
     ClientDTO clientDTO;
     AddressDTO addressDTO;
+
+    Map<String,Object> response;
+    Map<String, Object> request;
 
     @InjectMocks
     private PillotesController pillotesController;
@@ -51,7 +57,8 @@ public class PillotesControllerTest {
         clientDTO.setFirstName("Stavros");
         clientDTO.setLastName("Samaras");
         clientDTO.setEmail("stavsamaras@gmail.com");
-
+        response = new HashMap<>();
+        request = new HashMap<>();
     }
 
     @Test
@@ -60,5 +67,13 @@ public class PillotesControllerTest {
         ResponseEntity<OrderDTO> response = pillotesController.createOrders(orderDTO);
         assertNotNull(response);
     }
+
+    @Test
+    void getAllPillotes(){
+        Mockito.when(pillotesService.searchPillotes(Mockito.anyMap())).thenReturn(response);
+        ResponseEntity<Map<String,Object>> listResponse = pillotesController.searchPillotes(request);
+        assertNotNull(listResponse);
+    }
+
 
 }
