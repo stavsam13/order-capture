@@ -12,6 +12,12 @@ import com.tui.proof.repositories.OrderRepo;
 import com.tui.proof.util.Constants;
 import com.tui.proof.util.ErrorMessages;
 import com.tui.proof.util.PillotesFilteringProperties;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.Authorization;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.enums.ParameterIn;
+import io.swagger.v3.oas.annotations.media.Schema;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -90,6 +96,8 @@ public class PillotesService {
             throw new IllegalArgumentException(ErrorMessages.INVALID_NUMBER_PILLOTES);
         }
     }
+    @ApiOperation(value = "Update registration detail",
+            authorizations = { @Authorization(value="basicAuth") })
     public Map<String ,Object> searchPillotes(Map<String, Object> request) {
         Map<String, Object> filterOption = (Map<String, Object>) request.get(Constants.FILTERS);
         Map<String,Object> response = new HashMap<>();
@@ -103,6 +111,7 @@ public class PillotesService {
             OrderDTO itemToAdd = convertOrderEntityToDTO(orderEntity);
             listForResponse.add(itemToAdd);
         }
+        response.put("Total Orders",listForResponse.size());
         response.put("Orders Result",listForResponse);
         return response;}
         else {

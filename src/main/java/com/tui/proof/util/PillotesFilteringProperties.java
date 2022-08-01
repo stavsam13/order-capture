@@ -17,10 +17,6 @@ public class PillotesFilteringProperties {
     private String emailKey;
     private String telephoneKey;
     private String joinColumnOrderKey;
-    private String pageNumberKey;
-    private String pageSizeKey;
-    private String ascSortingKey;
-    private String descSortingKey;
     private List<String> filtersKey;
 
 }

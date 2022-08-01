@@ -1,8 +1,10 @@
 package com.tui.proof.controller;
 
+import com.tui.proof.entity.OrderEntity;
 import com.tui.proof.model.AddressDTO;
 import com.tui.proof.model.ClientDTO;
 import com.tui.proof.model.OrderDTO;
+import com.tui.proof.repositories.OrderRepo;
 import com.tui.proof.services.PillotesService;
 import com.tui.proof.ws.controller.PillotesController;
 import org.junit.jupiter.api.BeforeEach;
@@ -14,7 +16,6 @@ import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.ResponseEntity;
 
-import java.text.ParseException;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
@@ -25,6 +26,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 public class PillotesControllerTest {
 
     OrderDTO orderDTO;
+    OrderEntity orderEntity;
     ClientDTO clientDTO;
     AddressDTO addressDTO;
 
@@ -39,6 +41,9 @@ public class PillotesControllerTest {
     @BeforeEach
     void setup() {
         orderDTO = new OrderDTO();
+        orderEntity = new OrderEntity();
+        orderEntity.setOrderTime(LocalDateTime.now());
+        orderEntity.setOrderNumber(1L);
         orderDTO.setPilotes(5);
         orderDTO.setOrderTime(LocalDateTime.now());
         orderDTO.setOrderNumber(1L);
@@ -69,10 +74,16 @@ public class PillotesControllerTest {
     }
 
     @Test
-    void getAllPillotes(){
+    void searchPillotesTest(){
         Mockito.when(pillotesService.searchPillotes(Mockito.anyMap())).thenReturn(response);
         ResponseEntity<Map<String,Object>> listResponse = pillotesController.searchPillotes(request);
         assertNotNull(listResponse);
+    }
+
+    @Test
+    void updateOrderTest() throws Exception {
+        ResponseEntity<OrderDTO> response = pillotesController.updateOrder(1L,orderDTO);
+        assertNotNull(response);
     }
 
 

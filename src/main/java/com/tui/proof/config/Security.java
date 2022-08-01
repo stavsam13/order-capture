@@ -17,14 +17,13 @@ public class Security  {
     @Configuration
     public static class ApiWebSecurityConfigurationAdapter extends WebSecurityConfigurerAdapter  {
          protected void configure (HttpSecurity http) throws Exception {
-             http.
-                     csrf().disable().
-                     authorizeRequests()
+             http.authorizeRequests().antMatchers("/h2-console/**").permitAll()
+                     .and().csrf().ignoringAntMatchers("/h2-console/**")
+                     .and().headers().frameOptions().sameOrigin().and().csrf().disable().authorizeRequests()
                      .antMatchers("tuiTest/createPillotes").permitAll()
                 .antMatchers("/tuiTest/updatePillotes").permitAll()
                 .antMatchers("/tuiTest/searchPillotes")
                 .hasRole("USER").and().httpBasic();
-//                     .
         }
     }
 }
