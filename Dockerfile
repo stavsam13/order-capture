@@ -1,5 +1,6 @@
-FROM openjdk:8-jdk-alpine
-ARG JAR_FILE=target/*.jar
+FROM openjdk:11-jdk
+LABEL maintaner = "stavros.net"
+ADD target/backend-technical-test-2.0.0-SNAPSHOT.jar springboot-docker-tui.jar
 EXPOSE 8080
-COPY ${JAR_FILE} app.jar
-ENTRYPOINT ["java","-jar","/app.jar"]
+ENTRYPOINT ["java","-jar","springboot-docker-tui.jar"]
+#COPY ${JAR_FILE} app.jar

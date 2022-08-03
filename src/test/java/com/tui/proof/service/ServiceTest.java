@@ -107,13 +107,13 @@ public class ServiceTest {
      Assertions.assertNotNull(response);
     }
 
-    @Test
-    void searchPillotesTest() {
-        Mockito.when(pillotesService.getSpecification(filters)).thenReturn(specification);
-        Map<String,Object> response = pillotesService.searchPillotes(filters);
-        List<Map<String,Object>> responseList = new ArrayList<>();
-        responseList.add(0,response);
-    }
+//    @Test
+//    void searchPillotesTest() {
+//        Mockito.when(pillotesService.getSpecification(filters)).thenReturn(specification);
+//        Map<String,Object> response = pillotesService.searchPillotes(filters);
+//        List<Map<String,Object>> responseList = new ArrayList<>();
+//        responseList.add(0,response);
+//    }
 
     @Test
     void updatePillotesTest() throws Exception {

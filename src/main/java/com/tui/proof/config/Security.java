@@ -13,8 +13,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 public class Security extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(HttpSecurity http) throws Exception {
-        http
-        .csrf().ignoringAntMatchers("/h2-console/**","/swagger-ui/**").and()
+        http.csrf()
+        .ignoringAntMatchers("/h2-console/**").and()
                 .csrf().disable().authorizeRequests()
                 .antMatchers(  "/tuiTest/createPillotes",
                         "/tuiTest/updatePillotes","/h2-console/**").permitAll()
