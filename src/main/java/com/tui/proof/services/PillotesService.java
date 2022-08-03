@@ -12,12 +12,7 @@ import com.tui.proof.repositories.OrderRepo;
 import com.tui.proof.util.Constants;
 import com.tui.proof.util.ErrorMessages;
 import com.tui.proof.util.PillotesFilteringProperties;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.Authorization;
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.enums.ParameterIn;
-import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -96,8 +91,6 @@ public class PillotesService {
             throw new IllegalArgumentException(ErrorMessages.INVALID_NUMBER_PILLOTES);
         }
     }
-    @ApiOperation(value = "Update registration detail",
-            authorizations = { @Authorization(value="basicAuth") })
     public Map<String ,Object> searchPillotes(Map<String, Object> request) {
         Map<String, Object> filterOption = (Map<String, Object>) request.get(Constants.FILTERS);
         Map<String,Object> response = new HashMap<>();
@@ -119,7 +112,7 @@ public class PillotesService {
         }
     }
 
-    private Specification<OrderEntity> getSpecification(Map<String, Object> filterOption) {
+    public Specification<OrderEntity> getSpecification(Map<String, Object> filterOption) {
         Specification<OrderEntity> specification = Specification.where(null);
         for (String filter : pillotesFilteringProperties.getFiltersKey()) {
             Object value = filterOption.get(filter);

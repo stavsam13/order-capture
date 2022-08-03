@@ -1,38 +1,31 @@
 package com.tui.proof.config;
 
+import io.swagger.v3.oas.annotations.OpenAPIDefinition;
+import io.swagger.v3.oas.annotations.enums.SecuritySchemeIn;
+import io.swagger.v3.oas.annotations.enums.SecuritySchemeType;
+import io.swagger.v3.oas.annotations.info.Contact;
+import io.swagger.v3.oas.annotations.info.Info;
+import io.swagger.v3.oas.annotations.security.SecurityScheme;
+import io.swagger.v3.oas.models.OpenAPI;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import springfox.documentation.builders.ParameterBuilder;
-import springfox.documentation.builders.PathSelectors;
-import springfox.documentation.builders.RequestHandlerSelectors;
-import springfox.documentation.schema.ModelRef;
-import springfox.documentation.service.BasicAuth;
-import springfox.documentation.service.Parameter;
-import springfox.documentation.service.SecurityScheme;
-import springfox.documentation.spi.DocumentationType;
-import springfox.documentation.spring.web.plugins.Docket;
-import springfox.documentation.swagger2.annotations.EnableSwagger2;
 
-import java.util.ArrayList;
-import java.util.List;
-
-
+@OpenAPIDefinition(info = @Info(
+        title = "Tui test",
+        version = "1.0.0",
+        description = "API. Pilotes of the great Miquel Montoro is a simple API that let users"
+        + " create/update or search with customer's data the relative orders",
+        contact = @Contact(
+                name = "Stavros Samaras",
+                email = "stavsamaras@gmai.com"
+        )) )
+@SecurityScheme(
+        name = "user",
+        scheme = "basic",
+        type = SecuritySchemeType.HTTP,
+        in = SecuritySchemeIn.HEADER)
 @Configuration
-@EnableSwagger2
 public class SwaggerConfiguration {
-
-    private List<SecurityScheme> basicScheme() {
-        List<SecurityScheme> schemeList = new ArrayList<>();
-        schemeList.add(new BasicAuth("basicAuth"));
-        return schemeList;
-    }
     @Bean
-    public Docket api() {
-        return new Docket(DocumentationType.SWAGGER_2)
-                .select()
-                .apis(RequestHandlerSelectors.any())
-                .paths(PathSelectors.any())
-                .build()
-                .securitySchemes(basicScheme());
-    }
+    public OpenAPI springShopOpenAPI() {return new OpenAPI();}
 }

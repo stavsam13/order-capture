@@ -3,6 +3,11 @@ package com.tui.proof.ws.controller;
 import com.tui.proof.model.OrderDTO;
 import com.tui.proof.services.PillotesService;
 import com.tui.proof.util.ApisEndPoints;
+import io.swagger.v3.oas.annotations.enums.SecuritySchemeIn;
+import io.swagger.v3.oas.annotations.enums.SecuritySchemeType;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.security.SecurityScheme;
 import lombok.extern.log4j.Log4j2;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,7 +29,8 @@ public class PillotesController {
   @Autowired
   PillotesService pillotesService;
 
-  @GetMapping(value = ApisEndPoints.SEARCH_ORDER_ENDPOINT)
+  @PostMapping(value = ApisEndPoints.SEARCH_ORDER_ENDPOINT)
+  @SecurityRequirement(name = "user")
   public ResponseEntity<Map<String,Object>> searchPillotes(@RequestBody Map<String, Object> request) {
     LOGGER.info("Orders Retrieval");
     final Map<String,Object> responseList = pillotesService.searchPillotes(request);

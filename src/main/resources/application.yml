@@ -6,3 +6,16 @@ filters:
   telephoneKey: telephone
   joinColumnOrderKey: client
   filtersKey: ${filters.firstNameKey},${filters.lastNameKey},${filters.emailKey},${filters.telephoneKey}
+
+springdoc:
+  paths:
+    /tuiTest/searchPillotes:
+      get:
+        tags:
+          pillotes-controller
+  components:
+    securitySchemes:
+      user:
+        type: basic
+        name: user
+        in: header
