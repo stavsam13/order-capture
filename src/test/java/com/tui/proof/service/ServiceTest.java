@@ -17,12 +17,9 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.data.jpa.domain.Specification;
 
-import javax.persistence.criteria.CriteriaBuilder;
-import javax.persistence.criteria.CriteriaQuery;
-import javax.persistence.criteria.Predicate;
-import javax.persistence.criteria.Root;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -30,7 +27,7 @@ import java.util.List;
 import java.util.Map;
 
 import static org.junit.Assert.assertNotNull;
-
+@EnableConfigurationProperties(PillotesFilteringProperties.class)
 @ExtendWith(MockitoExtension.class)
 public class ServiceTest {
 
@@ -39,7 +36,7 @@ public class ServiceTest {
     @Mock
     private OrderEntity orderEntity;
     @Mock
-    private PillotesFilteringProperties pillotesFilteringProperties;
+    private PillotesFilteringProperties pillotesFilteringProperties = new PillotesFilteringProperties();
 
     @Mock
     private OrderRepo orderRepo;
@@ -52,20 +49,15 @@ public class ServiceTest {
 
     ClientEntity clientEntity;
 
-    Specification<OrderEntity> specification;
-    Map<String, Object> filters;
+    List<String> filters;
+    Map<String, Object> request;
+
+    List<OrderEntity> orderEntityList = new ArrayList<>();
     private final String URI = "/tuiTest/createPillotes";
     @BeforeEach
     void setup() {
-        specification = new Specification<OrderEntity>() {
-            @Override
-            public Predicate toPredicate(Root<OrderEntity> root, CriteriaQuery<?> criteriaQuery, CriteriaBuilder criteriaBuilder) {
-                return null;
-            }
-        };
+        request = new HashMap<>();
         orderDTO = new OrderDTO();
-        filters = new HashMap<>();
-        filters.put("firstname","Stavros");
         orderEntity = new OrderEntity();
         clientEntity = new ClientEntity();
         addressEntity = new AddressEntity();
@@ -80,6 +72,9 @@ public class ServiceTest {
         orderEntity.setOrderTime(LocalDateTime.now());
         orderEntity.setOrderNumber(1L);
         orderEntity.setClient(clientEntity);
+        orderEntity.setPilotes(10);
+        orderEntityList.add(orderEntity);
+        orderEntityList.add(orderEntity);
         orderDTO.setPilotes(5);
         orderDTO.setOrderTime(LocalDateTime.now());
         orderDTO.setOrderNumber(1L);
@@ -99,6 +94,15 @@ public class ServiceTest {
         clientDTO.setLastName("Samaras");
         clientDTO.setEmail("stavsamaras@gmail.com");
         orderDTO.setClient(clientDTO);
+        pillotesFilteringProperties.setFirstNameKey("Stavros");
+        pillotesFilteringProperties.setJoinColumnOrderKey("client");
+        filters = new ArrayList<>();
+        filters.add("firstName");
+        filters.add("lastName");
+        pillotesFilteringProperties.setFiltersKey(filters);
+        Map<String,Object> map = new HashMap<>();
+        map.put("firstName","Stavros");
+        request.put("filters",map);
        }
     @Test
     void createPilotesServiceTest() throws Exception {
@@ -107,13 +111,18 @@ public class ServiceTest {
      Assertions.assertNotNull(response);
     }
 
-//    @Test
-//    void searchPillotesTest() {
-//        Mockito.when(pillotesService.getSpecification(filters)).thenReturn(specification);
-//        Map<String,Object> response = pillotesService.searchPillotes(filters);
-//        List<Map<String,Object>> responseList = new ArrayList<>();
-//        responseList.add(0,response);
-//    }
+    @Test
+    void searchPillotesService(){
+        Mockito.when( pillotesFilteringProperties.getFiltersKey()).thenReturn(filters);
+        Mockito.when( pillotesFilteringProperties.getFirstNameKey()).thenReturn("firstName");
+        Mockito.when( pillotesFilteringProperties.getLastNameKey()).thenReturn("lastName");
+        Mockito.when( pillotesFilteringProperties.getEmailKey()).thenReturn("email");
+        Mockito.when( pillotesFilteringProperties.getTelephoneKey()).thenReturn("telephone");
+        Mockito.when( pillotesFilteringProperties.getJoinColumnOrderKey()).thenReturn("client");
+        Mockito.when(orderRepo.findAll(Mockito.any(Specification.class))).thenReturn(orderEntityList);
+        Map<String,Object> response = pillotesService.searchPillotes(request);
+        Assertions.assertEquals(2,response.size());
+    }
 
     @Test
     void updatePillotesTest() throws Exception {

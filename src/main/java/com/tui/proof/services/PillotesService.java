@@ -12,7 +12,6 @@ import com.tui.proof.repositories.OrderRepo;
 import com.tui.proof.util.Constants;
 import com.tui.proof.util.ErrorMessages;
 import com.tui.proof.util.PillotesFilteringProperties;
-import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -104,6 +103,7 @@ public class PillotesService {
             OrderDTO itemToAdd = convertOrderEntityToDTO(orderEntity);
             listForResponse.add(itemToAdd);
         }
+        LOGGER.info("Placing the order to my response");
         response.put("Total Orders",listForResponse.size());
         response.put("Orders Result",listForResponse);
         return response;}
@@ -164,7 +164,7 @@ public class PillotesService {
                     originalDTO.setOrderNumber(originalOrder.getOrderNumber());
                     originalDTO.getClient().setClientId(originalClientDTO.getClientId());
                     originalDTO.getClient().getAddress().setAddressId(originalAddressDTO.getAddressId());
-
+                    LOGGER.info("Update Service saving new records");
                     orderRepo.save(convertOrderDTOtoEntity(originalDTO));
                     orderRepo.flush();
                 } else {
