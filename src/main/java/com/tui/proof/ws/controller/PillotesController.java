@@ -3,6 +3,7 @@ package com.tui.proof.ws.controller;
 import com.tui.proof.model.OrderDTO;
 import com.tui.proof.services.PillotesService;
 import com.tui.proof.util.ApisEndPoints;
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import lombok.extern.log4j.Log4j2;
 import org.slf4j.Logger;
@@ -26,7 +27,7 @@ public class PillotesController {
   PillotesService pillotesService;
 
   @PostMapping(value = ApisEndPoints.SEARCH_ORDER_ENDPOINT)
-  @SecurityRequirement(name = "user")
+  @Operation(security = { @SecurityRequirement(name = "user") })
   public ResponseEntity<Map<String,Object>> searchPillotes(@RequestBody Map<String, Object> request) {
     LOGGER.info("Orders Retrieval");
     final Map<String,Object> responseList = pillotesService.searchPillotes(request);
