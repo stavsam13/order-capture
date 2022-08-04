@@ -18,9 +18,9 @@ public class Security extends WebSecurityConfigurerAdapter {
                 .csrf().disable().authorizeRequests()
                 .antMatchers(  "/tuiTest/createPillotes",
                         "/tuiTest/updatePillotes","/h2-console/**").permitAll()
-                .anyRequest().authenticated()
-                .and()
-                .httpBasic();
+                    .and().csrf().disable().authorizeRequests()
+                .antMatchers("/tuiTest/searchPillotes")
+                .hasRole("USER").and().httpBasic();
         http.csrf().disable();
         http.headers().frameOptions().disable();
     }
@@ -30,7 +30,7 @@ public class Security extends WebSecurityConfigurerAdapter {
         auth.inMemoryAuthentication()
                 .withUser("user")
                 .password(passwordEncoder().encode("password"))
-                .authorities("user");
+                .roles("USER");
     }
 
     @Bean
