@@ -29,7 +29,7 @@ public class ClientEntity {
     @NotNull
     private String telephone;
     @NotNull
-    @Email
+    @Email(message = "Please provide a correct form of email")
     private String email;
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "addressId",referencedColumnName = "addressId")

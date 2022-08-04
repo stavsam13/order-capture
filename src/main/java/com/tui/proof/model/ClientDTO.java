@@ -17,7 +17,7 @@ public class ClientDTO {
   @NotNull
   @NotEmpty
   private String lastName;
-  @Size(min = 10 , max=13, message = "telephone should have at least 10 to 13 digits")
+  @Size(min = 10 , max=15, message = "telephone should have at least 10 to 13 digits")
   private String telephone;
   @NotNull
   @Email(message = "Email is not valid")

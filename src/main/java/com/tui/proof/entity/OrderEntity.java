@@ -14,7 +14,7 @@ import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "PILOTES")
+@Table(name = "ORDER_TABLE")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
