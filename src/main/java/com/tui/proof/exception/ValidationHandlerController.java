@@ -1,4 +1,4 @@
-package com.tui.proof.Exception;
+package com.tui.proof.exception;
 
 import java.util.ArrayList;
 import java.util.List;

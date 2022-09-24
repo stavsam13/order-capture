@@ -11,6 +11,7 @@ import com.tui.proof.model.OrderDTO;
 import com.tui.proof.repositories.OrderRepo;
 import com.tui.proof.util.Constants;
 import com.tui.proof.util.ErrorMessages;
+import com.tui.proof.util.HelperClass;
 import com.tui.proof.util.PillotesFilteringProperties;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -58,23 +59,7 @@ public class PillotesService {
         return MAPPER.convertValue(clientEntity, ClientDTO.class);
     }
 
-    public static <T> Specification<T> createEqualSpecJoinClient(String key, Object value,
-                                                                String joinColumn ) {
-        return (root, criteriaQuery, criteriaBuilder) -> {
-            Join<OrderEntity, ClientEntity> join = root.join(joinColumn);
-            return criteriaBuilder.equal(join.get(key), value);
-        };
-    }
-
-    public static <T> Specification<T> createLikeSpecJoinClient(String key, Object value,
-                                                                  String joinColumn ) {
-        return (root, criteriaQuery, criteriaBuilder) -> {
-            Join<OrderEntity,ClientEntity> join = root.join(joinColumn);
-            return criteriaBuilder.like(join.get(key),"%" + value + "%");
-        };
-
-    }
-    public OrderDTO createPilotesService(OrderDTO orderDTO) throws Exception {
+    public OrderDTO createPilotesService(OrderDTO orderDTO)  {
 
         LOGGER.info("Create Service method has started");
         if (orderDTO.getPilotes() == 5 || orderDTO.getPilotes() == 10 || orderDTO.getPilotes() == 15) {
@@ -119,23 +104,23 @@ public class PillotesService {
             if (value != null) {
                 if (pillotesFilteringProperties.getFirstNameKey().equals(filter)) {
                     specification = specification.
-                            and(createLikeSpecJoinClient
+                            and(HelperClass.createLikeSpecJoinClient
                                     (pillotesFilteringProperties.getFirstNameKey(),value,
                                             pillotesFilteringProperties.getJoinColumnOrderKey()));
                 }
                 if (pillotesFilteringProperties.getLastNameKey().equals(filter)) {
                     specification = specification.
-                            and(createLikeSpecJoinClient(pillotesFilteringProperties.getLastNameKey(),value,
+                            and(HelperClass.createLikeSpecJoinClient(pillotesFilteringProperties.getLastNameKey(),value,
                                     pillotesFilteringProperties.getJoinColumnOrderKey()));
                 }
                 if (pillotesFilteringProperties.getEmailKey().equals(filter)) {
                     specification = specification.
-                            and(createLikeSpecJoinClient(pillotesFilteringProperties.getEmailKey(),value,
+                            and(HelperClass.createLikeSpecJoinClient(pillotesFilteringProperties.getEmailKey(),value,
                                     pillotesFilteringProperties.getJoinColumnOrderKey()));
                 }
                 if (pillotesFilteringProperties.getTelephoneKey().equals(filter)) {
                     specification = specification.
-                            and(createEqualSpecJoinClient(pillotesFilteringProperties.getTelephoneKey(),value,
+                            and(HelperClass.createEqualSpecJoinClient(pillotesFilteringProperties.getTelephoneKey(),value,
                                     pillotesFilteringProperties.getJoinColumnOrderKey()));
                 }
             }
@@ -143,7 +128,7 @@ public class PillotesService {
         return specification;
     }
 
-    public OrderDTO updatePilotesOrder(Long orderNumber, OrderDTO updatedOrderDTO) throws Exception {
+    public OrderDTO updatePilotesOrder(Long orderNumber, OrderDTO updatedOrderDTO) {
         LOGGER.info("Update Service method has started");
 
         OrderEntity originalOrder = orderRepo.findByOrderNumber(orderNumber);
