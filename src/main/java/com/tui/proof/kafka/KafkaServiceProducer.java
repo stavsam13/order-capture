@@ -1,32 +1,34 @@
 package com.tui.proof.kafka;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.tui.proof.model.NotificationDto;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.kafka.core.KafkaTemplate;
-import org.springframework.kafka.support.KafkaHeaders;
-import org.springframework.messaging.Message;
-import org.springframework.messaging.support.MessageBuilder;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 
-@Service
+@Component
 public class KafkaServiceProducer {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(KafkaServiceProducer.class);
 
-    private KafkaTemplate<String, NotificationDto> kafkaTemplate;
+    private final ObjectMapper objectMapper;
+    private final KafkaTemplate<String, String> kafkaTemplate;
 
-    public KafkaServiceProducer(KafkaTemplate<String, NotificationDto> kafkaTemplate) {
+
+    @Autowired
+    public KafkaServiceProducer (KafkaTemplate<String, String> kafkaTemplate, ObjectMapper objectMapper) {
         this.kafkaTemplate = kafkaTemplate;
+        this.objectMapper = objectMapper;
     }
 
-    public void sendMessage(NotificationDto notificationDto){
-        LOGGER.info(String.format("Message JSON format sent: %s",notificationDto.toString()));
-        Message<NotificationDto> message = MessageBuilder
-                .withPayload(notificationDto)
-                .setHeader(KafkaHeaders.TOPIC,"orderTopic")
-                .build();
+    public void sendMessage(NotificationDto notificationDto) throws JsonProcessingException {
+        String orderAsMessage = objectMapper.writeValueAsString(notificationDto);
+        kafkaTemplate.send("orderTopic", orderAsMessage);
 
-        kafkaTemplate.send(message);
+        LOGGER.info("food order produced {}", orderAsMessage);
+
     }
 }

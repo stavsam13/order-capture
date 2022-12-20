@@ -1,8 +1,8 @@
 package com.tui.proof.ws.controller;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.tui.proof.kafka.KafkaServiceProducer;
 import com.tui.proof.model.NotificationDto;
-import com.tui.proof.util.ApisEndPoints;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -18,7 +18,7 @@ public class TestKafkaController {
     KafkaServiceProducer kafkaServiceProducer;
 
     @PostMapping(value="/kafka")
-    public ResponseEntity<String> publish(@RequestBody NotificationDto notificationDto){
+    public ResponseEntity<String> publish(@RequestBody NotificationDto notificationDto) throws JsonProcessingException {
         kafkaServiceProducer.sendMessage(notificationDto);
         return ResponseEntity.ok("Message Json sent to kafka topic");
     }
